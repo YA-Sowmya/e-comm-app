@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String  @id @default(uuid())
+  name      String
+  email     String  @unique
+  password  String
+  role      String  @default("user")
+  createdAt DateTime @default(now())
+}
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  picture     String
+  
+  price       Float
+  description String
+  stock       Int
+  status      ProductStatus @default(ACTIVE)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+}
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[] // One-to-many relationship
+  createdAt DateTime  @default(now())
+}
+model Order {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  email         String
+  name          String
+  addressLine1  String
+  addressLine2  String?
+  city          String
+  state         String
+  postalCode    String
+  country       String
+  total         Int          // store as minor units (e.g. cents)
+  status        String       @default("paid")
+  stripePI      String       // PaymentIntent id for reference
+  items         OrderItem[]
+
+  // (Optionally relate to User if you have auth)
+  userId        String? 
+  // user         User? @relation(fields: [userId], references: [id])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  name      String
+  price     Int     // minor units
+  quantity  Int
+  picture   String?
+}

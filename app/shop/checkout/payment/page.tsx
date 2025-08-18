@@ -1,0 +1,130 @@
+"use client";
+
+import CheckoutStepper from "@/components/CheckoutStepper";
+import { useEffect, useState } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  PaymentElement,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
+import { useCartStore } from "@/store/cartStore";
+import { useCheckoutStore } from "@/store/checkoutStore";
+import { useRouter } from "next/navigation";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
+
+function PaymentInner({ clientSecret }: { clientSecret: string }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const router = useRouter();
+
+  const items = useCartStore((s) => s.items);
+  const total = useCartStore((s) =>
+    s.items.reduce(
+      (sum, i) => sum + Math.round(Number(i.price) * 100) * i.quantity,
+      0
+    )
+  );
+  const { details } = useCheckoutStore();
+
+  const [loading, setLoading] = useState(false);
+
+  const handlePay = async () => {
+    if (!stripe || !elements) return;
+    setLoading(true);
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/shop/checkout/success`,
+      },
+      redirect: "if_required",
+    });
+
+    if (error) {
+      alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (paymentIntent && paymentIntent.status === "succeeded") {
+      // Store order in DB
+      const res = await fetch("/api/webhook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          details,
+          items,
+          total,
+          stripePI: paymentIntent.id,
+        }),
+      });
+
+      if (!res.ok) {
+        setLoading(false);
+        alert(
+          "Failed to store order, but payment succeeded. Please contact support."
+        );
+        return;
+      }
+
+      router.push("/shop/checkout/success");
+    } else {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto border rounded-lg p-4">
+      <PaymentElement />
+      <button
+        onClick={handlePay}
+        disabled={!stripe || loading}
+        className="mt-4 w-full bg-cherry text-white py-2 rounded-full disabled:opacity-50">
+        {loading ? "Processing…" : "Pay now"}
+      </button>
+    </div>
+  );
+}
+
+export default function PaymentPage() {
+  const items = useCartStore((s) => s.items);
+  const total = useCartStore((s) =>
+    s.items.reduce(
+      (sum, i) => sum + Math.round(Number(i.price) * 100) * i.quantity,
+      0
+    )
+  );
+
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (items.length === 0 || total <= 0) return;
+    (async () => {
+      const res = await fetch("/api/stripe/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: total }),
+      });
+      const data = await res.json();
+      console.log("Stripe API response:", data);
+      setClientSecret(data.clientSecret);
+    })();
+  }, [total, items.length]);
+
+  if (!clientSecret) return <div className="p-6">Preparing payment…</div>;
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <CheckoutStepper current={2} />
+      <h1 className="text-2xl font-bold mb-4">Payment</h1>
+      <Elements stripe={stripePromise} options={{ clientSecret }}>
+        <PaymentInner clientSecret={clientSecret} />
+      </Elements>
+    </div>
+  );
+}
