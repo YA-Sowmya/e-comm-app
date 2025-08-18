@@ -14,10 +14,10 @@ export default function Navbar() {
         <Link href="/" className="hover:scale-110 transform transition">
           Home
         </Link>
-        <Link href="/shop" className="hover:text-gray-600">
+        <Link href="/shop" className="hover:scale-110 transform transition">
           Shop
         </Link>
-        <Link href="/about" className="hover:text-gray-600">
+        <Link href="/about" className="hover:scale-110 transform transition">
           About
         </Link>
       </div>
@@ -51,14 +51,16 @@ export default function Navbar() {
 
       {/* Right Links */}
       <div className="hidden shadow  md:flex items-center bg-white rounded-full mx-4 px-6 lg:px-12 py-2 font-heading text-cherry   justify-between w-full">
-        <Link href="/search" className="hover:text-gray-600">
+        <Link href="/search" className="hover:scale-110 transform transition">
           Search
         </Link>
-        <Link href="/shop/checkout/cart" className="hover:text-gray-600">
+        <Link
+          href="/shop/checkout/cart"
+          className="hover:scale-110 transform transition">
           Cart
           {totalCount > 0 && <span>({totalCount})</span>}
         </Link>
-        <Link href="/login" className="hover:text-gray-600">
+        <Link href="/login" className="hover:scale-110 transform transition">
           Login
         </Link>
       </div>
