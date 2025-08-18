@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="w-full bg-accent shadow-md p-4 flex items-center justify-center gap-2 text-lg lg:text-2xl">
       {/* Left Links */}
       <div className="hidden shadow md:flex items-center bg-white rounded-full mx-4 px-6 lg:px-12 py-2 font-heading text-cherry  justify-between w-full">
-        <Link href="/" className="hover:text-gray-600">
+        <Link href="/" className="hover:scale-110 transform transition">
           Home
         </Link>
         <Link href="/shop" className="hover:text-gray-600">
