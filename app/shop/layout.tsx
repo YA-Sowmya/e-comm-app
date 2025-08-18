@@ -1,13 +1,16 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
-export default async function ShopLayout({
+
+export default function ShopLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-accent h-screen">
+    <div className="bg-accent min-h-screen">
       <Navbar />
-      <main className="flex flex-col bg-accent w-full ">{children}</main>
+      <main className="flex flex-col bg-accent w-full">{children}</main>
     </div>
   );
 }
