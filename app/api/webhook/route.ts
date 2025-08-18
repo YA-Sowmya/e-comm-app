@@ -1,47 +1,55 @@
+// /api/webhook/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 
-const prisma = new PrismaClient();
+// ---------- Prisma Singleton ----------
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+const prisma = globalThis.prisma || new PrismaClient();
+if (!globalThis.prisma) globalThis.prisma = prisma;
+
+// ---------- Stripe Setup ----------
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {});
 
-// Stripe requires raw body, disable Next.js parsing
+// ---------- Disable body parsing for Stripe signature ----------
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
+// ---------- Webhook Handler ----------
 export async function POST(req: Request) {
-  const sig = req.headers.get("stripe-signature")!;
-  const body = await req.text(); // raw body
-
-  let event: Stripe.Event;
-
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: any) {
-    console.error("❌ Webhook signature verification failed:", err.message);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-  }
+    const sig = req.headers.get("stripe-signature");
+    if (!sig) throw new Error("Missing stripe-signature header");
 
-  try {
+    const body = await req.text(); // raw body required
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET!
+      );
+    } catch (err: any) {
+      console.error("❌ Webhook signature verification failed:", err.message);
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
+
+    // ---------- Checkout Session Completed ----------
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
 
-      // ✅ retrieve purchased items
+      // retrieve line items
       const lineItems = await stripe.checkout.sessions.listLineItems(
         session.id
       );
-
-      // ✅ custom metadata (userId, cart info)
       const userId = session.metadata?.userId ?? null;
 
-      // ✅ save order to database
       await prisma.order.create({
         data: {
           email: session.customer_details?.email ?? "",
@@ -55,28 +63,62 @@ export async function POST(req: Request) {
           total: session.amount_total ?? 0,
           stripePI: (session.payment_intent as string) ?? "",
           userId,
-
           items: {
             create: lineItems.data.map((item) => ({
               productId: (item.price?.product as string) ?? "unknown",
               name: item.description ?? "Unnamed product",
               price: item.amount_total ?? 0,
               quantity: item.quantity ?? 1,
-              picture: "", // optional: could pass in metadata
+              picture: "",
             })),
           },
         },
       });
 
-      console.log("✅ Order saved for session:", session.id);
+      console.log("✅ Order saved for Checkout Session:", session.id);
     }
+
+    // ---------- PaymentIntent Succeeded ----------
+    if (event.type === "payment_intent.succeeded") {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+      const userId = paymentIntent.metadata?.userId ?? null;
+      const products = JSON.parse(paymentIntent.metadata?.products ?? "[]");
+
+      await prisma.order.create({
+        data: {
+          email: paymentIntent.receipt_email ?? "",
+          name: "Guest",
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          state: "",
+          postalCode: "",
+          country: "",
+          total: paymentIntent.amount_received,
+          stripePI: paymentIntent.id,
+          userId,
+          items: {
+            create: products.map((item: any) => ({
+              productId: item.id,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              picture: item.picture ?? "",
+            })),
+          },
+        },
+      });
+
+      console.log("✅ Order saved for PaymentIntent:", paymentIntent.id);
+    }
+
+    return NextResponse.json({ received: true });
   } catch (err: any) {
-    console.error("❌ Error saving order:", err.message);
+    console.error("❌ Webhook error:", err.message);
     return NextResponse.json(
-      { error: "Failed to save order" },
+      { error: err.message || "Internal Server Error" },
       { status: 500 }
     );
   }
-
-  return NextResponse.json({ received: true });
 }
