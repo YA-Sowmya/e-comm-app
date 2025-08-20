@@ -4,15 +4,10 @@ import prisma from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {});
 
-// Stripe requires raw body for signature verification
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const config = { api: { bodyParser: false } };
 
 export async function POST(req: Request) {
-  const sig = req.headers.get("stripe-signature") as string;
+  const sig = req.headers.get("stripe-signature")!;
   const rawBody = await req.text();
 
   let event: Stripe.Event;
@@ -31,12 +26,13 @@ export async function POST(req: Request) {
   if (event.type === "payment_intent.succeeded") {
     const intent = event.data.object as Stripe.PaymentIntent;
 
-    // All metadata you attached in create-payment-intent
+    // Metadata comes as strings
     const {
       email,
       name,
       userId,
       addressLine1,
+      addressLine2,
       city,
       state,
       postalCode,
@@ -46,24 +42,29 @@ export async function POST(req: Request) {
     } = intent.metadata as any;
 
     try {
-      // Save the order + items
+      // Ensure cartItems is valid JSON array
+      const itemsArray = cartItems ? JSON.parse(cartItems) : [];
+
       await prisma.order.create({
         data: {
           email,
           name,
-          userId,
-          total: Number(total),
+          userId: userId || null,
+          total: Number(total || 0),
           stripePI: intent.id,
           addressLine1,
+          addressLine2: addressLine2 || null,
           city,
           state,
           postalCode,
           country,
           items: {
-            create: JSON.parse(cartItems).map((item: any) => ({
-              productId: item.id,
-              quantity: item.quantity,
-              price: item.price,
+            create: itemsArray.map((item: any) => ({
+              productId: item.id || "",
+              name: item.name || "Unnamed product",
+              quantity: Number(item.quantity || 1),
+              price: Number(item.price || 0),
+              picture: item.picture || null,
             })),
           },
         },
