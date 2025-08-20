@@ -3,6 +3,7 @@
 import Button from "@/components/Button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Bestsellers from "@/components/BestSellers";
 import AboutSection from "@/components/About";
 import CustomerReviews from "@/components/CustomerReviews";
 import SpecialOffers from "@/components/SpecialOffers";
@@ -72,7 +73,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
+      <Bestsellers />
       <section className="p-6  bg-cherry">
         <div className="border-t border-white py-2 md:py-6 px-12"></div>
         <div className="flex gap-2 items-center justify-center p-2 md:p-4">

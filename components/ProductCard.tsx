@@ -27,7 +27,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="p-4 flex flex-col  items-center gap-2">
-        <h3 className="font-heading text-cherry min-h-[8vh] text-lg text-center">
+        <h3 className="font-heading text-cherry Md:min-h-[8vh] text-lg text-center">
           {product.name}
         </h3>
         <p className="text-cherry font-bold">
