@@ -5,20 +5,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {});
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { amount, details, cart, userId } = body;
-
-    const safeCart = Array.isArray(cart) ? cart : [];
-
-    const cartItemsString = JSON.stringify(
-      safeCart.map((item: any) => ({
-        id: item.id || "",
-        name: item.name || "Unnamed product",
-        price: item.price || 0,
-        quantity: item.quantity || 1,
-        picture: item.picture || "",
-      }))
-    );
+    const { amount, details, items, userId } = await req.json();
+    const safeItems = Array.isArray(items) ? items : [];
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
@@ -35,7 +23,7 @@ export async function POST(req: Request) {
         postalCode: details?.postalCode || "",
         country: details?.country || "",
         total: amount.toString(),
-        cartItems: cartItemsString,
+        cartItems: JSON.stringify(safeItems),
       },
     });
 

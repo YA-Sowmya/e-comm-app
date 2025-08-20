@@ -10,7 +10,6 @@ export async function POST(req: Request) {
   const rawBody = await req.text();
 
   let event: Stripe.Event;
-
   try {
     event = stripe.webhooks.constructEvent(
       rawBody,
@@ -24,7 +23,6 @@ export async function POST(req: Request) {
 
   if (event.type === "payment_intent.succeeded") {
     const intent = event.data.object as Stripe.PaymentIntent;
-
     const {
       email,
       name,
@@ -39,12 +37,20 @@ export async function POST(req: Request) {
       cartItems,
     } = intent.metadata as any;
 
+    let itemsArray: any[] = [];
     try {
-      const itemsArray = cartItems ? JSON.parse(cartItems) : [];
+      itemsArray = cartItems ? JSON.parse(cartItems) : [];
+    } catch {
+      console.warn("⚠️ Failed to parse cartItems");
+    }
 
-      if (!email || !name || itemsArray.length === 0) {
-        console.warn("⚠️ Missing essential order info, skipping DB save");
-      } else {
+    if (!email || !name || itemsArray.length === 0) {
+      console.warn(
+        "⚠️ Missing essential order info, skipping DB save",
+        intent.id
+      );
+    } else {
+      try {
         await prisma.order.create({
           data: {
             email,
@@ -59,7 +65,7 @@ export async function POST(req: Request) {
             postalCode,
             country,
             items: {
-              create: itemsArray.map((item: any) => ({
+              create: itemsArray.map((item) => ({
                 productId: item.id || "",
                 name: item.name || "Unnamed product",
                 quantity: Number(item.quantity || 1),
@@ -69,12 +75,11 @@ export async function POST(req: Request) {
             },
           },
         });
-
         console.log("✅ Order stored in DB:", intent.id);
+      } catch (dbErr: any) {
+        console.error("❌ Database error:", dbErr.message);
+        return NextResponse.json({ error: "DB error" }, { status: 500 });
       }
-    } catch (dbErr: any) {
-      console.error("❌ Database error:", dbErr.message);
-      return NextResponse.json({ error: "DB error" }, { status: 500 });
     }
   }
 

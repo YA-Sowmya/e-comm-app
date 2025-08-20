@@ -24,12 +24,6 @@ function PaymentInner({ clientSecret }: { clientSecret: string }) {
   const router = useRouter();
 
   const items = useCartStore((s) => s.items);
-  const total = useCartStore((s) =>
-    s.items.reduce(
-      (sum, i) => sum + Math.round(Number(i.price) * 100) * i.quantity,
-      0
-    )
-  );
   const { details } = useCheckoutStore();
 
   const [loading, setLoading] = useState(false);
@@ -78,8 +72,7 @@ export default function PaymentPage() {
       0
     )
   );
-
-  const { details } = useCheckoutStore(); // <-- added
+  const { details } = useCheckoutStore();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
@@ -88,17 +81,15 @@ export default function PaymentPage() {
     (async () => {
       try {
         const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+
         const res = await fetch("/api/stripe/create-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount: total,
-            metadata: {
-              details: JSON.stringify(details),
-              items: JSON.stringify(items),
-              total,
-              userId: user?.id || null,
-            },
+            items,
+            details,
+            userId: user?.id || null,
           }),
         });
 
