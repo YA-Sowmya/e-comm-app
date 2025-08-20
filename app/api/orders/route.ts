@@ -42,3 +42,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+export async function GET() {
+  try {
+    const orders = await prisma.order.findMany({
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(orders);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}

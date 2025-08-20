@@ -14,7 +14,6 @@ export default function DetailsPage() {
   const items = useCartStore((s) => s.items);
   const { user } = useUserStore();
 
-  // Autofill checkout details with user info when logged in
   useEffect(() => {
     if (user) {
       if (!details.name) setDetails({ name: user.name });
@@ -37,8 +36,6 @@ export default function DetailsPage() {
       <h1 className="text-xl sm:text-2xl font-bold font-heading text-center m-4">
         Contact & Shipping
       </h1>
-
-      {/* Guest note only if not logged in */}
       {!user && (
         <div className="mb-4 rounded-lg font-body p-2">
           You’re checking out as a guest.{" "}

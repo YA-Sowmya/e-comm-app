@@ -23,7 +23,7 @@ export default function CreateProductForm() {
     []
   );
 
-  // ✅ Fetch categories on mount
+  // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {

@@ -29,9 +29,8 @@ export default function CategoriesPage() {
 
   const deleteCategory = async (id: string) => {
     try {
-      // First attempt to delete
       await axios.delete(`/api/categories/${id}`);
-      setCategories((prev) => prev.filter((cat) => cat.id !== id)); // Instant UI update
+      setCategories((prev) => prev.filter((cat) => cat.id !== id));
     } catch (error: any) {
       if (error.response?.status === 400) {
         const message =
@@ -41,7 +40,6 @@ export default function CategoriesPage() {
         );
 
         if (confirmDelete) {
-          // Force delete by deleting products first, then category
           await axios.delete(`/api/categories/${id}?force=true`);
           setCategories((prev) => prev.filter((cat) => cat.id !== id));
         }

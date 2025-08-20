@@ -51,7 +51,7 @@ model Order {
   postalCode    String
   country       String
   total         Int          // store as minor units (e.g. cents)
-  status        String       @default("paid")
+  status        String       @default("pending")
   stripePI      String       // PaymentIntent id for reference
   items         OrderItem[]
 

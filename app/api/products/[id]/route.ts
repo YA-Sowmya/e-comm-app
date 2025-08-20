@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-//GET
+
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
@@ -36,18 +36,15 @@ export async function PUT(
       }
     }
 
-    // Map category → categoryId
     if (data.category) {
       data.categoryId = data.category;
       delete data.category;
     }
 
-    // Ensure status enum is valid
     if (data.stock === 0) {
       data.status = "INACTIVE";
     }
 
-    // If frontend sent lowercase "inactive/active", normalize it
     if (typeof data.status === "string") {
       data.status = data.status.toUpperCase();
     }

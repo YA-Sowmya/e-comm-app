@@ -8,7 +8,6 @@ import { SlidersHorizontal, X } from "lucide-react";
 import { Range } from "react-range";
 import ProductCard from "@/components/ProductCard";
 
-// Type definitions
 interface Product {
   id: string;
   name: string;
@@ -46,14 +45,12 @@ export default function ProductsPage() {
       .then((data: Product[]) => setProducts(data));
   };
 
-  // fetch categories once
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
       .then((data: Category[]) => setCategories(data));
   }, []);
 
-  // fetch products when category changes OR when priceRange is applied
   useEffect(() => {
     fetchProducts();
   }, [category, priceRange]);
@@ -97,7 +94,7 @@ export default function ProductsPage() {
                 style={{
                   position: "absolute",
                   height: "100%",
-                  background: "#990000", // cherry
+                  background: "#990000",
                   left: `${((tempRange[0] - MIN) / (MAX - MIN)) * 100}%`,
                   width: `${
                     ((tempRange[1] - tempRange[0]) / (MAX - MIN)) * 100
@@ -122,8 +119,8 @@ export default function ProductsPage() {
 
       <button
         onClick={() => {
-          setPriceRange(tempRange); // apply filters
-          setIsOpen(false); // close mobile filter
+          setPriceRange(tempRange);
+          setIsOpen(false);
         }}
         className="mt-4 bg-cherry font-body border hover:bg-white hover:text-cherry text-white px-4 py-2 rounded-full">
         Apply
@@ -160,15 +157,14 @@ export default function ProductsPage() {
         </main>
       </div>
 
-      {/* Mobile Filter Drawer */}
+      {/* Mobile  */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex">
-          {/* backdrop */}
           <div
             className="flex-1 bg-black/40"
             onClick={() => setIsOpen(false)}
           />
-          {/* drawer */}
+
           <div className="w-78 bg-accent  h-full px-4 shadow-lg animate-slide-in">
             <div className="flex justify-between items-center mb-4">
               <h3 className=" font-heading">FILTERS</h3>

@@ -23,12 +23,10 @@ export default function LoginPage() {
     });
 
     if (res?.ok) {
-      // Delay for session cookie to be available
       setTimeout(async () => {
         const session = await getSession();
 
         if (session?.user) {
-          // Store user in Zustand
           setUser({
             id: session.user.id,
             name: session.user.name || "",
@@ -36,16 +34,15 @@ export default function LoginPage() {
             role: session.user.role || "user",
           });
 
-          // Redirect based on role
           if (session.user.role === "admin") {
             router.push("/admin");
           } else {
-            router.push("/shop"); // User dashboard or homepage
+            router.push("/shop");
           }
         } else {
           setError("Failed to load session. Please try again.");
         }
-      }, 200); // Delay helps ensure session cookie is ready
+      }, 200);
     } else {
       setError("Invalid email or password");
     }

@@ -28,7 +28,7 @@ export default function EditProductForm() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch product
+  //Fetch product
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -55,7 +55,7 @@ export default function EditProductForm() {
     if (id) fetchProduct();
   }, [id]);
 
-  // ✅ Fetch categories
+  //Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {

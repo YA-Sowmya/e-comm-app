@@ -27,12 +27,6 @@ export default function ProductsPage() {
     <div className="p-6 bg-white rounded-xl h-screen">
       <div className="flex justify-between text-cherry items-center ">
         <h1 className="text-2xl font-bold font-heading mb-6">Products</h1>
-        {/*<Link href="/admin/products/new">
-          <Button className="flex items-center justify-center">
-            <i className="bi bi-plus-lg text-lg leading-none" />
-            <span className="hidden md:inline-block ml-2">Add New Product</span>
-          </Button>
-        </Link>*/}
       </div>
 
       <table className="w-full border-separate border-spacing-y-3">

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 
-// POST handler for /api/signup
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -27,7 +26,7 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashedPassword,
-        role: "user", // default role
+        role: "user",
       },
     });
 

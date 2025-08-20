@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
-    console.error("❌ Webhook signature error:", err.message);
+    console.error("Webhook signature error:", err.message);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -41,14 +41,11 @@ export async function POST(req: Request) {
     try {
       itemsArray = cartItems ? JSON.parse(cartItems) : [];
     } catch {
-      console.warn("⚠️ Failed to parse cartItems");
+      console.warn("Failed to parse cartItems");
     }
 
     if (!email || !name || itemsArray.length === 0) {
-      console.warn(
-        "⚠️ Missing essential order info, skipping DB save",
-        intent.id
-      );
+      console.warn("Missing essential order info, skipping DB save", intent.id);
     } else {
       try {
         await prisma.order.create({
@@ -75,9 +72,9 @@ export async function POST(req: Request) {
             },
           },
         });
-        console.log("✅ Order stored in DB:", intent.id);
+        console.log(" Order stored in DB:", intent.id);
       } catch (dbErr: any) {
-        console.error("❌ Database error:", dbErr.message);
+        console.error(" Database error:", dbErr.message);
         return NextResponse.json({ error: "DB error" }, { status: 500 });
       }
     }

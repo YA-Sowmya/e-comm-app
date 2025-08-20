@@ -6,13 +6,11 @@ export async function POST(request: Request) {
 
   const timestamp = Math.round(new Date().getTime() / 1000);
 
-  // Merge timestamp with any params
   const params = {
     ...paramsToSign,
     timestamp,
   };
 
-  // Create signature
   const signature = crypto
     .createHash("sha1")
     .update(
