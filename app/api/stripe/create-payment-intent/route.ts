@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         postalCode: details?.postalCode || "",
         country: details?.country || "",
         total: amount.toString(),
-        cartItems: JSON.stringify(safeItems),
+        cartItems: safeItems.map((i) => `${i.id}:${i.quantity}`).join(","),
       },
     });
 
