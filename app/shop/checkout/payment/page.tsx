@@ -13,6 +13,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useCheckoutStore } from "@/store/checkoutStore";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
+
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
@@ -62,7 +63,7 @@ function PaymentInner({ clientSecret }: { clientSecret: string }) {
       <Button
         onClick={handlePay}
         disabled={!stripe || loading}
-        className=" w-full    disabled:opacity-50">
+        className="w-full disabled:opacity-50">
         {loading ? "Processing…" : "Pay now"}
       </Button>
     </div>
@@ -78,21 +79,37 @@ export default function PaymentPage() {
     )
   );
 
+  const { details } = useCheckoutStore(); // <-- added
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
     if (items.length === 0 || total <= 0) return;
+
     (async () => {
-      const res = await fetch("/api/stripe/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total }),
-      });
-      const data = await res.json();
-      console.log("Stripe API response:", data);
-      setClientSecret(data.clientSecret);
+      try {
+        const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+        const res = await fetch("/api/stripe/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: total,
+            metadata: {
+              details: JSON.stringify(details),
+              items: JSON.stringify(items),
+              total,
+              userId: user?.id || null,
+            },
+          }),
+        });
+
+        const data = await res.json();
+        console.log("Stripe API response:", data);
+        setClientSecret(data.clientSecret);
+      } catch (err) {
+        console.error("Error creating payment intent:", err);
+      }
     })();
-  }, [total, items.length]);
+  }, [total, items.length, details]);
 
   if (!clientSecret)
     return (

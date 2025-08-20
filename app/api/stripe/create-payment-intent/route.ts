@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amount, details, cart, userId } = body;
 
-    // Fallbacks to prevent undefined errors
     const safeCart = Array.isArray(cart) ? cart : [];
 
     const cartItemsString = JSON.stringify(

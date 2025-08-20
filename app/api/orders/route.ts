@@ -13,8 +13,8 @@ export async function POST(req: Request) {
 
     const order = await prisma.order.create({
       data: {
-        email: details.email || "unknown@example.com",
-        name: details.name || "Unnamed",
+        email: details.email || "",
+        name: details.name || "guest user",
         addressLine1: details.addressLine1 || "",
         addressLine2: details.addressLine2 || null,
         city: details.city || "",
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         items: {
           create: items.map((i: any) => ({
             productId: i.id || "",
-            name: i.name || "Unnamed",
+            name: i.name || "guest user",
             price: Math.round(Number(i.price) * 100),
             quantity: i.quantity || 1,
             picture: i.picture || null,
