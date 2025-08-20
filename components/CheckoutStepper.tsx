@@ -9,15 +9,15 @@ export default function CheckoutStepper({ current }: { current: 0 | 1 | 2 }) {
         const active = idx === current;
         const done = idx < current;
         return (
-          <div key={label} className="flex items-center gap-2">
+          <div key={label} className="flex items-center font-body gap-2">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center border 
+              className={`w-6 h-6 rounded-full flex items-center justify-center border 
                 ${
                   active
-                    ? "bg-cherry text-white border-cherry"
+                    ? "bg-white border-cherry text-cherry"
                     : done
-                    ? "bg-green-500 text-white border-green-500"
-                    : "bg-white text-gray-600 border-gray-300"
+                    ? "bg-cherry text-white bordercherry"
+                    : "bg-white text-cherry border-gray-300"
                 }`}>
               {idx + 1}
             </div>

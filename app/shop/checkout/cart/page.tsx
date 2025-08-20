@@ -3,7 +3,7 @@
 import CheckoutStepper from "@/components/CheckoutStepper";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
-
+import Button from "@/components/Button";
 export default function CartPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -19,23 +19,24 @@ export default function CartPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div className="max-w-5xl mx-auto px-4 py-6 text-cherry ">
       <CheckoutStepper current={0} />
 
-      <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+      <h1 className="text-xl sm:text-2xl font-bold font-heading text-center m-4">
+        Your Cart
+      </h1>
 
       {items.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p className="font-body text-center mt-12 ">Your cart is empty.</p>
       ) : (
         <>
-          <div className="overflow-x-auto border rounded-lg">
-            <table className="w-full text-left">
+          <div className="overflow-x-auto bg-white font-body rounded-lg shadow rounded-lg">
+            <table className="w-full  text-left">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="p-3">Product</th>
                   <th className="p-3">Price</th>
-                  <th className="p-3">Qty</th>
-                  <th className="p-3">Subtotal</th>
+                  <th className="p-3">Quantity</th>
                   <th className="p-3">Actions</th>
                 </tr>
               </thead>
@@ -44,8 +45,8 @@ export default function CartPage() {
                   const price = Math.round(Number(i.price) * 100);
                   const subtotal = price * i.quantity;
                   return (
-                    <tr key={i.id} className="border-t">
-                      <td className="p-3 flex items-center gap-3">
+                    <tr key={i.id} className="border-t-2 border-accent">
+                      <td className="p-3 flex items-center gap-4">
                         <img
                           src={i.picture}
                           alt={i.name}
@@ -57,13 +58,13 @@ export default function CartPage() {
                       <td className="p-3">
                         <div className="inline-flex items-center gap-2">
                           <button
-                            className="px-2 py-1 border rounded"
+                            className="px-2 py-1 border rounded-full hover:bg-cherry hover:text-white"
                             onClick={() => dec(i.id)}>
-                            -
+                            <i className="bi bi-dash"></i>
                           </button>
                           <span>{i.quantity}</span>
                           <button
-                            className="px-2 py-1 border rounded"
+                            className="px-2 py-1 border rounded-full hover:bg-cherry hover:text-white"
                             onClick={() =>
                               add({
                                 id: i.id,
@@ -72,16 +73,15 @@ export default function CartPage() {
                                 picture: i.picture,
                               })
                             }>
-                            +
+                            <i className="bi bi-plus"></i>
                           </button>
                         </div>
                       </td>
-                      <td className="p-3">${(subtotal / 100).toFixed(2)}</td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <button
-                          className="text-red-600"
+                          className="text-red-700 hover:text-gray-700"
                           onClick={() => remove(i.id)}>
-                          Remove
+                          <i className="bi bi-trash"></i>
                         </button>
                       </td>
                     </tr>
@@ -91,19 +91,21 @@ export default function CartPage() {
             </table>
           </div>
 
-          <div className="mt-4 flex items-center justify-between">
-            <button className="text-sm text-gray-600 underline" onClick={clear}>
+          <div className="mt-4 flex items-center font-body justify-between">
+            <button
+              className="text-sm text-gray-600 underline hover:text-cherry"
+              onClick={clear}>
               Clear cart
             </button>
-            <div className="text-right">
-              <div className="text-lg">
+            <div className="text-right ">
+              <div className="text-lg pr-3">
                 Total: <strong>${(total / 100).toFixed(2)}</strong>
               </div>
-              <button
-                className="mt-2 bg-cherry text-white px-4 py-2 rounded-full"
+              <Button
+                className="mt-2 "
                 onClick={() => router.push("/shop/checkout/details")}>
                 Next: Details
-              </button>
+              </Button>
             </div>
           </div>
         </>

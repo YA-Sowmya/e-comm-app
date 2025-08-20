@@ -12,7 +12,7 @@ import {
 import { useCartStore } from "@/store/cartStore";
 import { useCheckoutStore } from "@/store/checkoutStore";
 import { useRouter } from "next/navigation";
-
+import Button from "@/components/Button";
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
@@ -52,41 +52,19 @@ function PaymentInner({ clientSecret }: { clientSecret: string }) {
     }
 
     if (paymentIntent && paymentIntent.status === "succeeded") {
-      // Store order in DB
-      const res = await fetch("/api/webhook", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          details,
-          items,
-          total,
-          stripePI: paymentIntent.id,
-        }),
-      });
-
-      if (!res.ok) {
-        setLoading(false);
-        alert(
-          "Failed to store order, but payment succeeded. Please contact support."
-        );
-        return;
-      }
-
       router.push("/shop/checkout/success");
-    } else {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto border rounded-lg p-4">
+    <div className="max-w-xl mx-auto bg-white shadow rounded-lg space-y-6 p-6">
       <PaymentElement />
-      <button
+      <Button
         onClick={handlePay}
         disabled={!stripe || loading}
-        className="mt-4 w-full bg-cherry text-white py-2 rounded-full disabled:opacity-50">
+        className=" w-full    disabled:opacity-50">
         {loading ? "Processing…" : "Pay now"}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -116,12 +94,19 @@ export default function PaymentPage() {
     })();
   }, [total, items.length]);
 
-  if (!clientSecret) return <div className="p-6">Preparing payment…</div>;
+  if (!clientSecret)
+    return (
+      <div className="p-6 text-cherry font-body text-center mt-12">
+        Preparing payment…
+      </div>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
+    <div className="max-w-3xl mx-auto text-cherry px-4 py-6">
       <CheckoutStepper current={2} />
-      <h1 className="text-2xl font-bold mb-4">Payment</h1>
+      <h1 className="text-xl sm:text-2xl font-bold font-heading text-center m-4">
+        Payment
+      </h1>
       <Elements stripe={stripePromise} options={{ clientSecret }}>
         <PaymentInner clientSecret={clientSecret} />
       </Elements>

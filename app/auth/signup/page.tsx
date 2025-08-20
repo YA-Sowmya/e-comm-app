@@ -1,5 +1,5 @@
 "use client";
-
+import Button from "@/components/Button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -30,7 +30,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-gray-100">
+    <main className="flex items-center justify-center text-cherry min-h-screen bg-accent">
       <form
         onSubmit={handleSubmit}
         className="max-w-md w-full bg-white p-6 rounded shadow">
@@ -42,7 +42,7 @@ export default function SignupPage() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Name"
           required
-          className="w-full p-2 mb-4 border rounded font-body"
+          className="w-full p-2 mb-4 border focus:outline-cherry border-cherry rounded font-body"
         />
 
         <input
@@ -51,7 +51,7 @@ export default function SignupPage() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           required
-          className="w-full p-2 mb-4 border rounded font-body"
+          className="w-full p-2 mb-4 border focus:outline-cherry border-cherry rounded font-body"
         />
 
         <input
@@ -60,22 +60,19 @@ export default function SignupPage() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
-          className="w-full p-2 mb-4 border rounded font-body"
+          className="w-full p-2 mb-4 border focus:outline-cherry border-cherry rounded font-body"
         />
 
         {error && (
-          <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
+          <p className="text-cherry text-sm mb-2 text-center">{error}</p>
         )}
-
-        <button
-          type="submit"
-          className="w-full bg-cherryRed text-white p-2 rounded hover:bg-red-700 transition">
-          Sign Up
-        </button>
+        <div className="flex items-center justify-center">
+          <Button type="submit">Sign Up</Button>
+        </div>
 
         <p className="text-sm mt-4 text-center font-body">
           Already have an account?{" "}
-          <a href="/auth/login" className="text-cherryPink underline">
+          <a href="/auth/login" className="hover:font-bold underline">
             Log in
           </a>
         </p>

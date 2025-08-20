@@ -4,7 +4,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
-
+import Button from "@/components/Button";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +40,7 @@ export default function LoginPage() {
           if (session.user.role === "admin") {
             router.push("/admin");
           } else {
-            router.push("/"); // User dashboard or homepage
+            router.push("/shop"); // User dashboard or homepage
           }
         } else {
           setError("Failed to load session. Please try again.");
@@ -52,7 +52,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-gray-100">
+    <main className="flex items-center justify-center min-h-screen bg-accent text-cherry">
       <form
         onSubmit={handleSubmit}
         className="max-w-md w-full bg-white p-6 rounded shadow">
@@ -64,7 +64,7 @@ export default function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           required
-          className="w-full p-2 mb-4 border rounded font-body"
+          className="w-full p-2 mb-4 border focus:outline-cherry border-cherry rounded font-body"
         />
 
         <input
@@ -73,22 +73,20 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
-          className="w-full p-2 mb-4 border rounded font-body"
+          className="w-full p-2 mb-4 border focus:outline-cherry border-cherry rounded font-body"
         />
 
         {error && (
           <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
         )}
 
-        <button
-          type="submit"
-          className="w-full bg-cherryRed text-white p-2 rounded hover:bg-red-700 transition">
-          Login
-        </button>
+        <div className="flex items-center justify-center">
+          <Button type="submit">Login</Button>
+        </div>
 
         <p className="text-sm mt-4 text-center font-body">
           Don’t have an account?{" "}
-          <a href="/auth/signup" className="text-cherryPink underline">
+          <a href="/auth/signup" className="hover:font-bold underline">
             Sign up
           </a>
         </p>

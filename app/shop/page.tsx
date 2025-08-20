@@ -3,7 +3,12 @@
 import Button from "@/components/Button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
+import AboutSection from "@/components/About";
+import CustomerReviews from "@/components/CustomerReviews";
+import SpecialOffers from "@/components/SpecialOffers";
+import NewsletterSignup from "@/components/Newsletter";
+import FAQ from "@/components/FAQ";
+import Footer from "@/components/Footer";
 interface Category {
   id: string;
   name: string;
@@ -15,14 +20,19 @@ export default function HomePage() {
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
-      .then((data: Category[]) =>
-        setCategories([{ id: "all", name: "All" }, ...data])
-      );
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCategories([{ id: "all", name: "All" }, ...data]);
+        } else {
+          console.error("Unexpected API response:", data);
+        }
+      })
+      .catch((err) => console.error("Error fetching categories:", err));
   }, []);
 
   return (
     <>
-      <section className="w-full bg-accent">
+      <section id="banner" className="w-full bg-accent">
         <div className="text-center p-4 text-cherry font-heading">
           <h1 className="text-xl sm:text-3xl font-semibold tracking-wide">
             BITE INTO BLISS
@@ -53,9 +63,12 @@ export default function HomePage() {
 
         <div className="bg-cherry">
           <div className="max-w-6xl mx-auto p-4 text-white text-center">
-            <Button className="rounded-full bg-white text-cherry font-heading shadow hover:font-bold hover:scale-105 transform transition">
+            <a
+              href="/shop/products"
+              className="rounded-full bg-white py-2 px-4 text-sm md:text-xl text-cherry font-heading shadow  font-bold
+               hover:bg-cherry hover:shadow-white hover:text-white transform transition">
               SHOP NOW
-            </Button>
+            </a>
           </div>
         </div>
       </section>
@@ -68,21 +81,27 @@ export default function HomePage() {
             Shop By Category
           </h2>
         </div>
-        <div className="flex flex-wrap justify-center gap-4  md:gap-12">
+        <div className="flex flex-wrap justify-center gap-4 lg:gap-16 mt-4">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               href={`/shop/products${
                 cat.id === "all" ? "" : `?category=${cat.id}`
               }`}
-              className="flex items-center justify-center rounded-full bg-white shadow-sm shadow-accent
-              w-25 h-25 sm:w-30 sm:h-30 md:w-38 md:h-38 text-xs sm:text-sm md:text-lg  
-              text-cherry font-heading hover:shadow-md transition">
+              className="flex items-center justify-center rounded-full bg-white shadow-accent
+              w-20 h-20 md:w-30 sm:h-30  text-xs sm:text-sm md:text-2xl  
+              text-cherry font-heading hover:scale-110  transition">
               {cat.name}
             </Link>
           ))}
         </div>
       </section>
+      <AboutSection />
+      <CustomerReviews />
+      <SpecialOffers />
+      <NewsletterSignup />
+      <FAQ />
+      <Footer />
     </>
   );
 }

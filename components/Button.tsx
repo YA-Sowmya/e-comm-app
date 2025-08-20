@@ -22,11 +22,12 @@ export default function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`px-4 py-2 bg-cherry md:px-6 text-sm md:text-xl text-accent rounded-full border hover:bg-white hover:text-cherry hover:border-cherry transition ${
-        disabled
-          ? "bg-gray-400 cursor-not-allowed"
-          : "bg-blue-600 hover:bg-blue-700"
-      }${className}`}>
+      className={`px-4 py-2 bg-cherry md:px-6 text-sm md:text-xl text-accent rounded-full border 
+        font-body hover:bg-white hover:text-cherry hover:border-cherry transition ${
+          disabled
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+        }${className}`}>
       {children}
     </button>
   );

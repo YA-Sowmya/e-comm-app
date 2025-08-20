@@ -5,6 +5,11 @@ import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
 import Button from "@/components/Button";
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 export default function EditProductForm() {
   const router = useRouter();
   const { id } = useParams();
@@ -14,28 +19,30 @@ export default function EditProductForm() {
     description: "",
     price: "",
     stock: "",
-    category: "",
+    categoryId: "",
     status: "INACTIVE",
     picture: "",
   });
 
+  const [categories, setCategories] = useState<Category[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch existing product and prefill form
+  // ✅ Fetch product
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await fetch(`/api/products/${id}`);
         if (!res.ok) throw new Error("Failed to fetch product");
         const data = await res.json();
+
         setFormData({
           name: data.name || "",
           description: data.description || "",
           price: data.price?.toString() || "",
           stock: data.stock?.toString() || "",
-          category: data.category || "",
-          status: data.status || "INACTIVE",
+          categoryId: data.categoryId || "",
+          status: data.status?.toUpperCase() || "INACTIVE",
           picture: data.picture || "",
         });
       } catch (err) {
@@ -44,8 +51,22 @@ export default function EditProductForm() {
         setLoading(false);
       }
     };
+
     if (id) fetchProduct();
   }, [id]);
+
+  // ✅ Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/api/categories");
+        setCategories(res.data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -109,7 +130,7 @@ export default function EditProductForm() {
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock),
-        status,
+        status: status.toUpperCase(),
       }),
     });
 
@@ -120,7 +141,8 @@ export default function EditProductForm() {
     }
   };
 
-  if (loading) return <p className="p-8">Loading product...</p>;
+  if (loading)
+    return <p className="p-8 text-center text-cherry">Loading product...</p>;
 
   return (
     <div className="p-8 text-body bg-white w-full flex-col h-screen rounded-lg text-cherry">
@@ -199,13 +221,17 @@ export default function EditProductForm() {
                 Category
               </label>
               <select
-                name="category"
-                value={formData.category}
+                name="categoryId"
+                value={formData.categoryId}
                 onChange={handleChange}
                 required
                 className="w-full border border-cherry rounded-lg px-4 p-2">
                 <option value="">Select category</option>
-                <option value="others">Other Products</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
               </select>
             </div>
 

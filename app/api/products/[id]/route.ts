@@ -22,7 +22,6 @@ export async function GET(
     );
   }
 }
-// UPDATE product
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
@@ -30,7 +29,6 @@ export async function PUT(
   try {
     const body = await req.json();
 
-    // Remove undefined or null values so they don't overwrite existing data
     const data: Record<string, any> = {};
     for (const [key, value] of Object.entries(body)) {
       if (value !== undefined && value !== null && value !== "") {
@@ -38,9 +36,20 @@ export async function PUT(
       }
     }
 
-    // Auto-update status if stock is explicitly set to 0
+    // Map category → categoryId
+    if (data.category) {
+      data.categoryId = data.category;
+      delete data.category;
+    }
+
+    // Ensure status enum is valid
     if (data.stock === 0) {
-      data.status = "inactive";
+      data.status = "INACTIVE";
+    }
+
+    // If frontend sent lowercase "inactive/active", normalize it
+    if (typeof data.status === "string") {
+      data.status = data.status.toUpperCase();
     }
 
     const updatedProduct = await prisma.product.update({
@@ -49,8 +58,8 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedProduct);
-  } catch (error) {
-    console.error("Error updating product:", error);
+  } catch (error: any) {
+    console.error("Error updating product:", error.message);
     return NextResponse.json(
       { error: "Error updating product" },
       { status: 500 }
