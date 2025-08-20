@@ -3,19 +3,20 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {});
 
-// Expecting body from frontend: { amount, details: {...}, cart: [...] }
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { amount, details, cart, userId } = body; // amount in cents
+    const { amount, details, cart, userId } = body;
 
-    // Convert cart to JSON string for metadata
+    // Fallbacks to prevent undefined errors
+    const safeCart = Array.isArray(cart) ? cart : [];
+
     const cartItemsString = JSON.stringify(
-      cart.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
+      safeCart.map((item: any) => ({
+        id: item.id || "",
+        name: item.name || "Unnamed product",
+        price: item.price || 0,
+        quantity: item.quantity || 1,
         picture: item.picture || "",
       }))
     );
@@ -25,15 +26,15 @@ export async function POST(req: Request) {
       currency: "usd",
       automatic_payment_methods: { enabled: true },
       metadata: {
-        email: details.email || "",
-        name: details.name || "",
+        email: details?.email || "",
+        name: details?.name || "",
         userId: userId || "",
-        addressLine1: details.addressLine1 || "",
-        addressLine2: details.addressLine2 || "",
-        city: details.city || "",
-        state: details.state || "",
-        postalCode: details.postalCode || "",
-        country: details.country || "",
+        addressLine1: details?.addressLine1 || "",
+        addressLine2: details?.addressLine2 || "",
+        city: details?.city || "",
+        state: details?.state || "",
+        postalCode: details?.postalCode || "",
+        country: details?.country || "",
         total: amount.toString(),
         cartItems: cartItemsString,
       },
