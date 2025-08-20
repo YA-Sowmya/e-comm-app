@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+#  E-Comm App
 
-## Getting Started
+A modern **E-commerce Web Application** built with **Next.js** and powered by a robust backend using **Prisma, PostgreSQL (Railway), and custom API routes**.  
+It features **authentication, admin dashboard, order management, and a seamless shopping experience** for users.  
 
-First, run the development server:
+Live Demo: [E-Comm App](https://e-comm-app-chi.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##  Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+###  User Features
+- Browse and search products
+- Add products to cart (state management with **Zustand**)
+- Secure authentication with **NextAuth**
+- Place orders with real-time status updates
+- Persistent cart and order history
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+###  Admin Features
+- Admin dashboard for managing:
+  - Products (CRUD)
+  - Categories
+  - Orders (update status: Pending → Shipped → Delivered)
+- Custom API endpoints for order management
+- View all orders
 
-## Learn More
+###  Tech Highlights
+- **Next.js 15 (App Router)** for frontend & backend
+- **NextAuth** for authentication
+- **Prisma ORM** with **PostgreSQL** (hosted on Railway)
+- **Zustand** for global state management
+- **Custom API Routes** for orders, products, and categories
+- **TailwindCSS** for UI styling
+- **Deployed on Vercel**
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+##  Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Frontend:** Next.js, React, TailwindCSS  
+- **Backend:** Next.js Route Handlers, Prisma ORM  
+- **Database:** PostgreSQL (Railway)  
+- **Authentication:** NextAuth  
+- **State Management:** Zustand  
+- **Deployment:** Vercel  
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📂 Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
